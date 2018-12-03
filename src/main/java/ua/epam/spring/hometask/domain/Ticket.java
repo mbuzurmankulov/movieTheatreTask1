@@ -1,11 +1,14 @@
 package ua.epam.spring.hometask.domain;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
  * @author Yuriy_Tkach
  */
+@Getter
 public class Ticket extends DomainObject implements Comparable<Ticket> {
 
     private User user;
@@ -21,22 +24,6 @@ public class Ticket extends DomainObject implements Comparable<Ticket> {
         this.event = event;
         this.dateTime = dateTime;
         this.seat = seat;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-    public long getSeat() {
-        return seat;
     }
 
     @Override

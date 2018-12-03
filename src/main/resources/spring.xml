@@ -49,7 +49,6 @@
         <property name="name" value="Avengers"/>
         <property name="airDates" ref="airDates"/>
         <property name="basePrice" value="10"/>
-        <property name="vipPrice" value="20"/>
         <property name="rating" value="HIGH"></property>
         <property name="auditoriums" ref="dateTimeAuditoriums"/>
     </bean>

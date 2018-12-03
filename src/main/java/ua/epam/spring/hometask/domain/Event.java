@@ -5,11 +5,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author Yuriy_Tkach
@@ -18,13 +14,21 @@ import java.util.TreeSet;
 @Setter
 public class Event extends DomainObject {
 
+    public static final double VIP_PRICE_COEFFICIENT = 2;
+    private static final Map<EventRating, Double> ratingCoefficient;
+
+    static {
+        ratingCoefficient = new HashMap<>();
+        ratingCoefficient.put(EventRating.HIGH, 1.2);
+        ratingCoefficient.put(EventRating.MID, 1.0);
+        ratingCoefficient.put(EventRating.LOW, 0.8);
+    }
+
     private String name;
 
     private NavigableSet<LocalDateTime> airDates = new TreeSet<>();
 
     private double basePrice;
-
-    private double vipPrice;
 
     private EventRating rating;
 
@@ -148,6 +152,18 @@ public class Event extends DomainObject {
     public boolean airsOnDateTimes(LocalDateTime from, LocalDateTime to) {
         return airDates.stream()
                 .anyMatch(dt -> dt.compareTo(from) >= 0 && dt.compareTo(to) <= 0);
+    }
+
+    public Double getSeatPrice(Long seatNumber, LocalDateTime dateTime){
+        Auditorium auditorium = getAuditoriums().get(dateTime);
+        Double seatPrice = basePrice;
+        if(auditorium.getVipSeats().contains(seatNumber)){
+            seatPrice = basePrice*VIP_PRICE_COEFFICIENT;
+        } else if (auditorium.getAllSeats().contains(seatNumber)) {
+            seatPrice = basePrice;
+        } else {return null;}
+
+        return seatPrice*ratingCoefficient.get(getRating());
     }
 
     @Override
