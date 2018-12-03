@@ -1,5 +1,8 @@
 package ua.epam.spring.hometask.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.NavigableMap;
@@ -11,6 +14,8 @@ import java.util.TreeSet;
 /**
  * @author Yuriy_Tkach
  */
+@Getter
+@Setter
 public class Event extends DomainObject {
 
     private String name;
@@ -18,6 +23,8 @@ public class Event extends DomainObject {
     private NavigableSet<LocalDateTime> airDates = new TreeSet<>();
 
     private double basePrice;
+
+    private double vipPrice;
 
     private EventRating rating;
 
@@ -138,44 +145,9 @@ public class Event extends DomainObject {
                 .anyMatch(dt -> dt.toLocalDate().compareTo(from) >= 0 && dt.toLocalDate().compareTo(to) <= 0);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public NavigableSet<LocalDateTime> getAirDates() {
-        return airDates;
-    }
-
-    public void setAirDates(NavigableSet<LocalDateTime> airDates) {
-        this.airDates = airDates;
-    }
-
-    public double getBasePrice() {
-        return basePrice;
-    }
-
-    public void setBasePrice(double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public EventRating getRating() {
-        return rating;
-    }
-
-    public void setRating(EventRating rating) {
-        this.rating = rating;
-    }
-
-    public NavigableMap<LocalDateTime, Auditorium> getAuditoriums() {
-        return auditoriums;
-    }
-
-    public void setAuditoriums(NavigableMap<LocalDateTime, Auditorium> auditoriums) {
-        this.auditoriums = auditoriums;
+    public boolean airsOnDateTimes(LocalDateTime from, LocalDateTime to) {
+        return airDates.stream()
+                .anyMatch(dt -> dt.compareTo(from) >= 0 && dt.compareTo(to) <= 0);
     }
 
     @Override

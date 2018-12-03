@@ -17,7 +17,7 @@
     </properties>
 
     <build>
-        <resources>
+        <!--<resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
@@ -26,7 +26,7 @@
                     <include>**/*</include>
                 </includes>
             </resource>
-        </resources>
+        </resources>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -82,7 +82,7 @@
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>3.0.3</version>
                 <configuration>
-                    <!-- Enables analysis which takes more memory but finds 
+                    <!-- Enables analysis which takes more memory but finds
                         more bugs. If you run out of memory, changes the value of the effort element 
                         to 'Low'. -->
                     <effort>Max</effort>
@@ -92,7 +92,7 @@
                     <threshold>Low</threshold>
                     <!-- Produces XML report -->
                     <xmlOutput>true</xmlOutput>
-                    <!-- Configures the directory in which the XML report 
+                    <!-- Configures the directory in which the XML report
                         is created -->
                     <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
                 </configuration>
@@ -108,6 +108,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>${findbugs.version}</version>
@@ -118,6 +124,12 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <organization>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+ 		http://www.springframework.org/schema/beans
+ 		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/util
+ 		http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:auditorium.properties</value>
+            </list>
+        </property>
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="systemPropertiesMode">
+            <util:constant
+                    static-field="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+        </property>
+    </bean>
+
+    <bean id="app" class="ua.epam.spring.hometask.App">
+    </bean>
+    
+    <bean name="auditorium1" class="ua.epam.spring.hometask.domain.Auditorium">
+        <property name="name" value="${name1}"/>
+        <property name="numberOfSeats" value="${numberOfSeats1}"/>
+        <property name="vipSeats">
+            <list>
+                <value type="java.lang.Long">${vipSeats1.1}</value>
+                <value type="java.lang.Long">${vipSeats1.2}</value>
+                <value type="java.lang.Long">${vipSeats1.3}</value>
+            </list>
+        </property>
+    </bean>
+
+    <util:set set-class="java.util.TreeSet" id="airDates">
+        <value type="java.time.LocalDateTime">#{T(java.time.LocalDateTime).of(2018, 12, 24, 0, 0)}</value>
+    </util:set>
+
+    <util:map map-class="java.util.TreeMap" id="dateTimeAuditoriums">
+        <entry key="#{T(java.time.LocalDateTime).of(2018, 12, 24, 0, 0)}" value-ref="auditorium1"/>
+    </util:map>
+
+    <bean id="event1" class="ua.epam.spring.hometask.domain.Event">
+        <property name="id" value="1"/>
+        <property name="name" value="Avengers"/>
+        <property name="airDates" ref="airDates"/>
+        <property name="basePrice" value="10"/>
+        <property name="vipPrice" value="20"/>
+        <property name="rating" value="HIGH"></property>
+        <property name="auditoriums" ref="dateTimeAuditoriums"/>
+    </bean>
+
+    <bean name="userService" class="ua.epam.spring.hometask.service.impl.UserServiceImpl">
+    </bean>
+
+    <util:set id="auditoriums">
+        <ref bean="auditorium1"/>
+    </util:set>
+
+    <bean name="auditoriumService" class="ua.epam.spring.hometask.service.impl.AuditoriumServiceImpl">
+        <constructor-arg ref="auditoriums"/>
+    </bean>
+
+    <bean name="eventService" class="ua.epam.spring.hometask.service.impl.EventServiceImpl">
+        <constructor-arg value="1"/>
+        <constructor-arg>
+            <map>
+                <entry key="1" value-ref="event1"/>
+            </map>
+        </constructor-arg>
+    </bean>
+</beans>
