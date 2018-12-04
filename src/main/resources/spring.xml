@@ -95,7 +95,7 @@
         <constructor-arg ref="discountService"/>
     </bean>
 
-    <bean id="app" class="ua.epam.spring.hometask.App">
+    <bean id="app" class="ua.epam.spring.hometask.App" destroy-method="destroy">
         <constructor-arg name="userService" ref="userService"/>
         <constructor-arg name="eventService" ref="eventService"/>
         <constructor-arg name="bookingService" ref="bookingService"/>
