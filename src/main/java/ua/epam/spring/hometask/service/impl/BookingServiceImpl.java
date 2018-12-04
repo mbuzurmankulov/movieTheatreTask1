@@ -6,6 +6,7 @@ import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.BookingService;
+import ua.epam.spring.hometask.service.DiscountService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,14 +17,22 @@ public class BookingServiceImpl implements BookingService {
 
     private final Map<Event, Map<LocalDateTime, Set<Ticket>>> ticketsMap = new HashMap<>();
 
+    private DiscountService discountService;
+
+    public BookingServiceImpl(DiscountService discountService){
+        this.discountService = discountService;
+    }
+
     @Override
     public double getTicketsPrice(@Nonnull Event event, @Nonnull LocalDateTime dateTime, @Nullable User user, @Nonnull Set<Long> seats) {
         if(!event.airsOnDateTime(dateTime)){
             throw new InvalidStateException("Event does not air at this time!");
         }
 
+        double discount = (100 - (double)discountService.getDiscount(user, event, dateTime, seats.size()))/100;
+
         return seats.stream()
-                .map(s -> event.getSeatPrice(s, dateTime).orElse(0.0))
+                .map(s -> event.getSeatPrice(s, dateTime).orElse(0.0)*discount)
                 .reduce(0.0, Double::sum);
     }
 
@@ -42,6 +51,9 @@ public class BookingServiceImpl implements BookingService {
         if(ticketSet == null){
             ticketSet = new HashSet<>();
             timeTicketsMap.put(ticket.getDateTime(), ticketSet);
+        }
+        if(ticket.getUser() != null){
+            ticket.getUser().getTickets().add(ticket);
         }
         ticketSet.add(ticket);
     }

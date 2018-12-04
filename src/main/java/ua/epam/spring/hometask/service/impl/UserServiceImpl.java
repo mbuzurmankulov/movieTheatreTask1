@@ -6,6 +6,7 @@ import ua.epam.spring.hometask.service.UserService;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail("user_1@gmail.com");
         user.setFirstName("Max");
         user.setLastName("Wasowski");
+        user.setBirthday(LocalDate.of(1989,12,23));
         user.setTickets(new TreeSet<>());
         userMap.put(user.getId(), user);
     }

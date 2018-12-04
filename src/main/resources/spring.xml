@@ -8,6 +8,8 @@
         http://www.springframework.org/schema/util
  		http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
+    <import resource="discount-strategies.xml"/>
+
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
@@ -71,5 +73,18 @@
                 <entry key="1" value-ref="event1"/>
             </map>
         </constructor-arg>
+    </bean>
+
+    <util:set set-class="java.util.HashSet" id="discountStrategies">
+        <ref bean="birthdayDiscountStrategy"/>
+        <ref bean="loyaltyDiscountStrategy"/>
+    </util:set>
+
+    <bean id="discountService" class="ua.epam.spring.hometask.service.impl.DiscountServiceImpl">
+        <constructor-arg ref="discountStrategies"/>
+    </bean>
+
+    <bean id="bookingService" class="ua.epam.spring.hometask.service.impl.BookingServiceImpl">
+        <constructor-arg ref="discountService"/>
     </bean>
 </beans>

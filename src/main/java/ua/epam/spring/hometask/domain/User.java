@@ -3,6 +3,7 @@ package ua.epam.spring.hometask.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.TreeSet;
@@ -19,6 +20,8 @@ public class User extends DomainObject {
     private String lastName;
 
     private String email;
+
+    private LocalDate birthday;
 
     private NavigableSet<Ticket> tickets = new TreeSet<>();
 
