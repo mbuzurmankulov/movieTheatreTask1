@@ -1,6 +1,5 @@
 package ua.epam.spring.hometask.service.impl;
 
-import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.UserService;
 
@@ -13,19 +12,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private volatile static Long CURRENT_ID = 0L;
-    private static final Map<Long, User> userMap;
+    private static final Map<Long, User> userMap = new HashMap<>();
 
-    static {
-        //Todo replace with properties file load
-        userMap = new HashMap<>();
-        User user = new User();
-        user.setId(++CURRENT_ID);
-        user.setEmail("user_1@gmail.com");
-        user.setFirstName("Max");
-        user.setLastName("Wasowski");
-        user.setBirthday(LocalDate.of(1989,12,23));
-        user.setTickets(new TreeSet<>());
-        userMap.put(user.getId(), user);
+    public UserServiceImpl(User admin){
+        admin.setAdmin(true);
+        admin.setId(++CURRENT_ID);
+        admin.setBirthday(LocalDate.now());
+        userMap.put(admin.getId(),admin);
     }
 
     @Nullable
@@ -37,6 +30,16 @@ public class UserServiceImpl implements UserService {
                 .findFirst()
                 .orElse(null);
 
+    }
+
+    @Override
+    public User checkUserCredentials(String login, String password) {
+        User user = userMap.entrySet().stream()
+                .filter(e -> e.getValue().getEmail().equals(login))
+                .findFirst()
+                .map(Map.Entry::getValue)
+                .orElse(null);
+        return user != null && password.equals(user.getPassword()) ? user: null;
     }
 
     @Override

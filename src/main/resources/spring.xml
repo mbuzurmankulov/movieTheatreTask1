@@ -14,6 +14,7 @@
         <property name="locations">
             <list>
                 <value>classpath:auditorium.properties</value>
+                <value>classpath:users.properties</value>
             </list>
         </property>
         <property name="ignoreResourceNotFound" value="true" />
@@ -21,9 +22,6 @@
             <util:constant
                     static-field="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE" />
         </property>
-    </bean>
-
-    <bean id="app" class="ua.epam.spring.hometask.App">
     </bean>
     
     <bean name="auditorium1" class="ua.epam.spring.hometask.domain.Auditorium">
@@ -55,7 +53,16 @@
         <property name="auditoriums" ref="dateTimeAuditoriums"/>
     </bean>
 
-    <bean name="userService" class="ua.epam.spring.hometask.service.impl.UserServiceImpl">
+    <bean id="adminUser" class="ua.epam.spring.hometask.domain.User">
+        <property name="firstName" value="${admin.firstName}"/>
+        <property name="lastName" value="${admin.lastName}"/>
+        <property name="email" value="${admin.email}"/>
+        <property name="password" value="${admin.password}"/>
+    </bean>
+
+    <bean name="userService"
+          class="ua.epam.spring.hometask.service.impl.UserServiceImpl">
+        <constructor-arg ref="adminUser"/>
     </bean>
 
     <util:set id="auditoriums">
@@ -86,5 +93,11 @@
 
     <bean id="bookingService" class="ua.epam.spring.hometask.service.impl.BookingServiceImpl">
         <constructor-arg ref="discountService"/>
+    </bean>
+
+    <bean id="app" class="ua.epam.spring.hometask.App">
+        <constructor-arg name="userService" ref="userService"/>
+        <constructor-arg name="eventService" ref="eventService"/>
+        <constructor-arg name="bookingService" ref="bookingService"/>
     </bean>
 </beans>

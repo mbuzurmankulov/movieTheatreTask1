@@ -21,7 +21,11 @@ public class User extends DomainObject {
 
     private String email;
 
+    private String password;
+
     private LocalDate birthday;
+
+    private boolean isAdmin = false;
 
     private NavigableSet<Ticket> tickets = new TreeSet<>();
 
