@@ -154,16 +154,16 @@ public class Event extends DomainObject {
                 .anyMatch(dt -> dt.compareTo(from) >= 0 && dt.compareTo(to) <= 0);
     }
 
-    public Double getSeatPrice(Long seatNumber, LocalDateTime dateTime){
+    public Optional<Double> getSeatPrice(Long seatNumber, LocalDateTime dateTime){
         Auditorium auditorium = getAuditoriums().get(dateTime);
         Double seatPrice = basePrice;
         if(auditorium.getVipSeats().contains(seatNumber)){
             seatPrice = basePrice*VIP_PRICE_COEFFICIENT;
         } else if (auditorium.getAllSeats().contains(seatNumber)) {
             seatPrice = basePrice;
-        } else {return null;}
+        } else {return Optional.empty();}
 
-        return seatPrice*ratingCoefficient.get(getRating());
+        return Optional.of(seatPrice*ratingCoefficient.get(getRating()));
     }
 
     @Override
