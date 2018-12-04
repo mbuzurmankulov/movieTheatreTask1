@@ -3,14 +3,15 @@ package ua.epam.spring.hometask;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sun.plugin.dom.exception.InvalidStateException;
+import ua.epam.spring.hometask.domain.Event;
+import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class App {
 
@@ -61,6 +62,15 @@ public class App {
             case 2:
                 displayRegisterMenu();
                 break;
+            case 3:
+                displayBookTicketMenu();
+                break;
+            case 4:
+                displayCreateEventMenu();
+                break;
+            case 5:
+                displayMyTickets();
+                break;
         }
     }
 
@@ -69,7 +79,6 @@ public class App {
 
         Set<Integer> allowedCommands = new HashSet<>();
 
-        allowedCommands.addAll(Arrays.asList(3,6));
         if(currentUser == null) {
             System.out.println("Login -  press 1");
             allowedCommands.add(1);
@@ -78,18 +87,26 @@ public class App {
             System.out.println("Register - press 2");
             allowedCommands.add(2);
         }
-        System.out.println("Book tickets - press 3");
+        if(currentUser == null || !currentUser.isAdmin()) {
+            System.out.println("Book tickets - press 3");
+            allowedCommands.add(3);
+        }
         if(currentUser != null && currentUser.isAdmin()){
             System.out.println("Create Event - press 4");
             allowedCommands.add(4);
         }
-        if(currentUser != null){
-            System.out.println("Logout - press 5");
+        if(currentUser != null && !currentUser.isAdmin()){
+            System.out.println("My tickets - press 5");
             allowedCommands.add(5);
         }
-        System.out.println("Exit - press 6");
+        if(currentUser != null){
+            System.out.println("Logout - press 6");
+            allowedCommands.add(6);
+        }
+        System.out.println("Exit - press 7");
+        allowedCommands.add(7);
 
-        Integer command = 0;
+        Integer command;
         while (true) {
             String commandStr = scanner.nextLine();
             try {
@@ -112,14 +129,20 @@ public class App {
                 currentMenu = 2;
                 break;
             case 3:
+                currentMenu = 3;
                 break;
             case 4:
+                currentMenu = 4;
                 break;
             case 5:
-                currentUser = null;
-                userInfo = "You are visiting as Anonymous user.";
+                currentMenu = 5;
                 break;
             case 6:
+                currentUser = null;
+                currentMenu = 0;
+                userInfo = "You are visiting as Anonymous user.";
+                break;
+            case 7:
                 currentMenu = -1;
                 break;
         }
@@ -138,7 +161,7 @@ public class App {
                 currentMenu = 0;
                 break;
             } else {
-                System.out.println("User with such email and password does not exist. You want to continue y/n:");
+                System.out.println("User with such email and password does not exist. You want to continue? y/n:");
                 String command  = scanner.nextLine();
                 if (command.equals("y")) continue;
                 else {
@@ -152,19 +175,19 @@ public class App {
     private void displayRegisterMenu(){
         String email = fillInStrInfo(
                 "Fill in your email:",
-                "email cannot be empty! You want to try again y/n",
+                "email cannot be empty! You want to try again? y/n:",
                 0);
         if (email == null) return;
 
         String password = fillInStrInfo(
                 "Fill in password:",
-                "password cannot be empty! You want to try again y/n",
+                "password cannot be empty! You want to try again? y/n:",
                 0);
         if (password == null) return;
 
         String firstName = fillInStrInfo(
                 "Fill in your first name:",
-                "first name cannot be empty! You want to try again y/n",
+                "first name cannot be empty! You want to try again? y/n:",
                 0);
         if (firstName == null) return;
 
@@ -173,7 +196,7 @@ public class App {
 
         LocalDate birthday = fillInDateInfo(
                 "Fill in your birthday in fallowing format year-month-date, for example 2018-12-23 :",
-                "Invalid birthday! You want to try again y/n",
+                "Invalid birthday! You want to try again? y/n:",
                 0);
         if (birthday == null) return;
 
@@ -187,6 +210,100 @@ public class App {
         userService.save(newUser);
         currentUser = newUser;
         userInfo = "You are logged in as " + newUser.getFirstName() + " " + newUser.getLastName() + ".";
+        currentMenu = 0;
+    }
+
+    private void displayBookTicketMenu(){
+        System.out.println("\nAll available events:\n");
+        List<Event> events = eventService.getAfterDateTime(LocalDateTime.now()).stream().collect(Collectors.toList());
+        for(int i = 0; i<events.size(); i++ ){
+            System.out.println(events.get(i).getName() + " - press " + i);
+        }
+
+        Integer eventIndex = fillInIntInfo(
+                "\nChoose an event number:",
+                "Invalid event number! You want to try again? y/n:",
+                 0,
+                 events.size(),
+                 0);
+        if(eventIndex ==null) return;
+
+        Event event = events.get(eventIndex);
+
+        System.out.println("\n Choose time slot for event \"" + event.getName() + "\".\n");
+        List<LocalDateTime> airDates = event.getAirDates().stream().collect(Collectors.toList());
+
+        for(int i = 0; i<airDates.size(); i++ ){
+            System.out.println(airDates.get(i) + " - press " + i);
+        }
+
+        Integer airDateIndex = fillInIntInfo(
+                "\nChoose date by typing in the number next to the date:",
+                "Invalid number! You want to try again? y/n:",
+                0,
+                events.size(),
+                0);
+        if(airDateIndex == null) return;
+        LocalDateTime dateTime = airDates.get(airDateIndex);
+        Set<Long> availableRegularSeats = bookingService.getRegularAvailableSeats(event, dateTime);
+        Set<Long> availableVipSeats = bookingService.getVipAvailableSeats(event, dateTime);
+
+        System.out.println("\nAvailable regular seats:");
+        availableRegularSeats.forEach(s -> System.out.print(s + ","));
+
+        System.out.println("\nAvailable vip seats:");
+        availableVipSeats.forEach(s -> System.out.print(s + ","));
+
+        System.out.println("\nChoose seats by listing them in one line separated by comma, e.g. 3,4,10");
+        Set<Long> selectedSeats;
+        while (true) {
+            String strInput = scanner.nextLine();
+            try{
+                String[] tmpSeats = strInput.split(",");
+                if(tmpSeats.length == 0) {
+                    tmpSeats = new String[1];
+                    tmpSeats[0] = strInput;
+                }
+                selectedSeats = Arrays.stream(tmpSeats)
+                .map(Long::parseLong)
+                .filter(s -> availableRegularSeats.contains(s) || availableVipSeats.contains(s))
+                .collect(Collectors.toSet());
+            }catch (Exception ex) {
+                System.out.println("Invalid list of seats! Want to try again! y/n:");
+                String command = scanner.nextLine();
+                if(command.equals("y")){
+                    continue;
+                }else {
+                    currentMenu = 0;
+                    return;
+                }
+            }
+            break;
+        }
+        Double price = bookingService.getTicketsPrice(event, dateTime, currentUser, selectedSeats);
+        System.out.println("Total price is " + price + ". Are you sure you want to buy tickets? y/n:");
+        String command = scanner.nextLine();
+        if(command.equals("y")){
+            bookingService.bookTickets(selectedSeats.stream()
+                    .map(s -> new Ticket(currentUser, event, dateTime, s)).collect(Collectors.toSet()));
+        }
+        currentMenu = 0;
+    }
+
+    private void displayCreateEventMenu(){
+        System.out.println("\n!!!Event creation is not implemented!\n");
+        currentMenu = 0;
+    }
+
+    private void displayMyTickets(){
+        System.out.println("\nAll tickets booked by you\n");
+        for(Ticket ticket : currentUser.getTickets()){
+            System.out.println("*********************************");
+            System.out.println("Event: " + ticket.getEvent().getName());
+            System.out.println("Date: " + ticket.getDateTime());
+            System.out.println("Seat: " + ticket.getSeat());
+            System.out.println("*********************************\n");
+        }
         currentMenu = 0;
     }
 

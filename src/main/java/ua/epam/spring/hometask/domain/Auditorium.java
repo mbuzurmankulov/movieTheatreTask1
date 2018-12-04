@@ -41,6 +41,12 @@ public class Auditorium {
         return LongStream.range(1, numberOfSeats+1).boxed().collect(Collectors.toSet());
     }
 
+    public Set<Long> getRegularSeats(){
+        return getAllSeats().stream()
+                .filter(s -> !vipSeats.contains(s))
+                .collect(Collectors.toSet());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(name);

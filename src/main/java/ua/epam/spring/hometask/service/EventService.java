@@ -35,6 +35,7 @@ public interface EventService extends AbstractDomainObjectService<Event> {
      public @Nonnull Set<Event> getForDateRange(@Nonnull LocalDate from,
                                 @Nonnull LocalDate to);
 
+    public @Nonnull Set<Event> getAfterDateTime(@Nonnull LocalDateTime from);
     /*
      * Return events from 'now' till the the specified date time
      * 

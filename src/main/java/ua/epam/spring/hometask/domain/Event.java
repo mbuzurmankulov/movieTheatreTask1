@@ -149,6 +149,11 @@ public class Event extends DomainObject {
                 .anyMatch(dt -> dt.toLocalDate().compareTo(from) >= 0 && dt.toLocalDate().compareTo(to) <= 0);
     }
 
+    public boolean airsAfterDate(LocalDateTime from) {
+        return airDates.stream()
+                .anyMatch(dt -> dt.compareTo(from) >= 0);
+    }
+
     public boolean airsOnDateTimes(LocalDateTime from, LocalDateTime to) {
         return airDates.stream()
                 .anyMatch(dt -> dt.compareTo(from) >= 0 && dt.compareTo(to) <= 0);

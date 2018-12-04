@@ -1,7 +1,6 @@
 package ua.epam.spring.hometask.service.impl;
 
 import sun.plugin.dom.exception.InvalidStateException;
-import ua.epam.spring.hometask.domain.Auditorium;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
@@ -12,6 +11,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BookingServiceImpl implements BookingService {
 
@@ -62,6 +62,26 @@ public class BookingServiceImpl implements BookingService {
     @Nonnull
     @Override
     public Set<Ticket> getPurchasedTicketsForEvent(@Nonnull Event event, @Nonnull LocalDateTime dateTime) {
-        return ticketsMap.get(event).get(dateTime);
+        return ticketsMap.get(event) !=null ?ticketsMap.get(event).get(dateTime): new HashSet<>();
+    }
+
+    @Override
+    public Set<Long> getRegularAvailableSeats(@Nonnull Event event, @Nonnull LocalDateTime dateTime) {
+        Set<Long> soldOutSeats = getPurchasedTicketsForEvent(event, dateTime).stream()
+                .map(Ticket::getSeat)
+                .collect(Collectors.toSet());
+        return event.getAuditoriums().get(dateTime).getRegularSeats().stream()
+                .filter(s -> !soldOutSeats.contains(s))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<Long> getVipAvailableSeats(@Nonnull Event event, @Nonnull LocalDateTime dateTime) {
+        Set<Long> soldOutSeats = getPurchasedTicketsForEvent(event, dateTime).stream()
+                .map(Ticket::getSeat)
+                .collect(Collectors.toSet());
+        return event.getAuditoriums().get(dateTime).getVipSeats().stream()
+                .filter(s -> !soldOutSeats.contains(s))
+                .collect(Collectors.toSet());
     }
 }

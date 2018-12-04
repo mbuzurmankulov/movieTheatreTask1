@@ -40,6 +40,15 @@ public class EventServiceImpl implements EventService {
 
     @Nonnull
     @Override
+    public Set<Event> getAfterDateTime(@Nonnull LocalDateTime from) {
+        return eventMap.entrySet().stream()
+                .map(e -> e.getValue())
+                .filter(e -> e.airsAfterDate(from))
+                .collect(Collectors.toSet());
+    }
+
+    @Nonnull
+    @Override
     public Set<Event> getNextEvents(@Nonnull LocalDateTime to) {
         LocalDateTime now = LocalDateTime.now();
         return eventMap.entrySet().stream()

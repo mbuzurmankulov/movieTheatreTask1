@@ -17,6 +17,7 @@ public class BirthdayDiscountStrategy extends DiscountStrategy {
 
     @Override
     public byte calculateDiscount(@Nullable User user, @Nonnull Event event, @Nonnull LocalDateTime airDateTime, long numberOfTickets) {
+        if(user ==null) return 0;
         Period period = Period.between(user.getBirthday().withYear(LocalDate.now().getYear()), airDateTime.toLocalDate());
         return Math.abs(period.getDays()) <= 5 ? discount : 0;
     }
