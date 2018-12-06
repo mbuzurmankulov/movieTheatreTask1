@@ -1,0 +1,87 @@
+package ua.epam.spring.hometask.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
+import ua.epam.spring.hometask.App;
+import ua.epam.spring.hometask.domain.Auditorium;
+import ua.epam.spring.hometask.domain.Event;
+import ua.epam.spring.hometask.domain.EventRating;
+import ua.epam.spring.hometask.domain.User;
+import ua.epam.spring.hometask.service.EventService;
+import ua.epam.spring.hometask.service.UserService;
+import ua.epam.spring.hometask.service.impl.EventServiceImpl;
+import ua.epam.spring.hometask.service.impl.UserServiceImpl;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Configuration
+@Import(DiscountStrategiesConfig.class)
+@PropertySource({
+        "classpath:auditorium.properties",
+        "classpath:users.properties" //if same key, this will 'win'
+        })
+@ComponentScan(basePackages = {"ua.epam.spring.hometask"})
+public class SpringConfig {
+
+    @Autowired
+    private Environment env;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertyConfig() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean(name = "mainAuditorium")
+    public Auditorium mainAuditorium(){
+        Auditorium auditorium = new Auditorium();
+        auditorium.setName(env.getProperty("mainAuditorium.name"));
+        auditorium.setNumberOfSeats(Integer.parseInt(env.getProperty("mainAuditorium.numberOfSeats")));
+        String vipSeatsStr = env.getProperty("mainAuditorium.vipSeats");
+        Set<Long> vipSeats = vipSeatsStr.isEmpty() ?
+                                    new HashSet<>() :
+                                    (vipSeatsStr.contains(",") ?
+                                            Arrays.stream(vipSeatsStr.split(","))
+                                                .map(Long::parseLong).collect(Collectors.toSet()) :
+                                            Arrays.asList(Long.parseLong(vipSeatsStr)).stream().collect(Collectors.toSet()));
+        auditorium.setVipSeats(vipSeats);
+        return  auditorium;
+    }
+
+    @Bean(name = "mainEvent")
+    public Event mainEvent(){
+        Event event = new Event();
+        event.setId(1L);
+        event.setName("Avengers");
+        NavigableSet<LocalDateTime> airDates = new TreeSet<>();
+        airDates.add(LocalDateTime.now().plusDays(1));
+        event.setAirDates(airDates);
+        event.setBasePrice(10);
+        event.setRating(EventRating.HIGH);
+        NavigableMap<LocalDateTime, Auditorium> dateTimeAuditoriumMap = new TreeMap<>();
+        dateTimeAuditoriumMap.put(airDates.iterator().next(),mainAuditorium());
+        event.setAuditoriums(dateTimeAuditoriumMap);
+        return event;
+    }
+
+    @Bean
+    public EventService eventService() {
+        Event event = mainEvent();
+        Map<Long,Event> eventMap = new HashMap<>();
+        eventMap.put(event.getId(), event);
+        return new EventServiceImpl(event.getId(),eventMap);
+    }
+
+    @Bean(name = "adminUser")
+    public User adminUser(){
+        User admin = new User();
+        admin.setFirstName(env.getProperty("admin.firstName"));
+        admin.setLastName(env.getProperty("admin.lastName"));
+        admin.setEmail(env.getProperty("admin.email"));
+        admin.setPassword(env.getProperty("admin.password"));
+        return admin;
+    }
+}

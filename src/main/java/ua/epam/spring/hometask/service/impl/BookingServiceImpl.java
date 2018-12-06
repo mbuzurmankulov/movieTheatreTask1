@@ -1,5 +1,7 @@
 package ua.epam.spring.hometask.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import sun.plugin.dom.exception.InvalidStateException;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
@@ -13,12 +15,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class BookingServiceImpl implements BookingService {
 
     private final Map<Event, Map<LocalDateTime, Set<Ticket>>> ticketsMap = new HashMap<>();
 
     private DiscountService discountService;
 
+    @Autowired
     public BookingServiceImpl(DiscountService discountService){
         this.discountService = discountService;
     }

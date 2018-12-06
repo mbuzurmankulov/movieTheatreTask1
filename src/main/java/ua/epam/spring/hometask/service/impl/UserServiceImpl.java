@@ -1,5 +1,8 @@
 package ua.epam.spring.hometask.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.UserService;
 
@@ -9,12 +12,14 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private volatile static Long CURRENT_ID = 0L;
     private static final Map<Long, User> userMap = new HashMap<>();
 
-    public UserServiceImpl(User admin){
+    @Autowired
+    public UserServiceImpl(@Qualifier("adminUser")User admin){
         admin.setAdmin(true);
         admin.setId(++CURRENT_ID);
         admin.setBirthday(LocalDate.now());

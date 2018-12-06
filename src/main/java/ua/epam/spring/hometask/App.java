@@ -1,18 +1,23 @@
 package ua.epam.spring.hometask;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 import sun.plugin.dom.exception.InvalidStateException;
+import ua.epam.spring.hometask.config.SpringConfig;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.*;
 
+import javax.annotation.PreDestroy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 public class App {
 
     private UserService userService;
@@ -24,6 +29,7 @@ public class App {
     private String userInfo;
     private Scanner scanner;
 
+    @Autowired
     public App(UserService userService, EventService eventService, BookingService bookingService){
         this.userService = userService;
         this.eventService = eventService;
@@ -31,12 +37,13 @@ public class App {
         scanner = new Scanner(System.in);
     }
 
+    @PreDestroy
     public void destroy(){
         scanner.close();
     }
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+        ConfigurableApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
         App app =  (App)ctx.getBean("app");
         app.start();
         ctx.close();
