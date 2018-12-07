@@ -19,11 +19,10 @@ public class UserServiceImpl implements UserService {
     private static final Map<Long, User> userMap = new HashMap<>();
 
     @Autowired
-    public UserServiceImpl(@Qualifier("adminUser")User admin){
-        admin.setAdmin(true);
-        admin.setId(++CURRENT_ID);
-        admin.setBirthday(LocalDate.now());
-        userMap.put(admin.getId(),admin);
+    public UserServiceImpl(Set<User> users){
+        users.forEach(u -> {
+            u.setId(++CURRENT_ID);
+            userMap.put(u.getId(), u);});
     }
 
     @Nullable

@@ -4,16 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
-import ua.epam.spring.hometask.App;
 import ua.epam.spring.hometask.domain.Auditorium;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.EventRating;
 import ua.epam.spring.hometask.domain.User;
 import ua.epam.spring.hometask.service.EventService;
-import ua.epam.spring.hometask.service.UserService;
 import ua.epam.spring.hometask.service.impl.EventServiceImpl;
-import ua.epam.spring.hometask.service.impl.UserServiceImpl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,13 +73,26 @@ public class SpringConfig {
         return new EventServiceImpl(event.getId(),eventMap);
     }
 
-    @Bean(name = "adminUser")
+    @Bean
     public User adminUser(){
         User admin = new User();
         admin.setFirstName(env.getProperty("admin.firstName"));
         admin.setLastName(env.getProperty("admin.lastName"));
         admin.setEmail(env.getProperty("admin.email"));
         admin.setPassword(env.getProperty("admin.password"));
+        admin.setBirthday(LocalDate.parse(env.getProperty("admin.birthday")));
+        admin.setAdmin(true);
+        return admin;
+    }
+
+    @Bean
+    public User firstUser(){
+        User admin = new User();
+        admin.setFirstName(env.getProperty("user1.firstName"));
+        admin.setLastName(env.getProperty("user1.lastName"));
+        admin.setEmail(env.getProperty("user1.email"));
+        admin.setPassword(env.getProperty("user1.password"));
+        admin.setBirthday(LocalDate.parse(env.getProperty("user1.birthday")));
         return admin;
     }
 }

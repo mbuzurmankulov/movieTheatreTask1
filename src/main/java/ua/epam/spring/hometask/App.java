@@ -223,6 +223,11 @@ public class App {
     private void displayBookTicketMenu(){
         System.out.println("\nAll available events:\n");
         List<Event> events = eventService.getAfterDateTime(LocalDateTime.now()).stream().collect(Collectors.toList());
+        if(events == null || events.size() == 0){
+            System.out.println("Unfortunately, there are no upcoming events! Please, come back later.\n");
+            currentMenu = 0;
+            return;
+        }
         for(int i = 0; i<events.size(); i++ ){
             System.out.println(events.get(i).getName() + " - press " + i);
         }
@@ -303,13 +308,17 @@ public class App {
     }
 
     private void displayMyTickets(){
-        System.out.println("\nAll tickets booked by you\n");
-        for(Ticket ticket : currentUser.getTickets()){
-            System.out.println("*********************************");
-            System.out.println("Event: " + ticket.getEvent().getName());
-            System.out.println("Date: " + ticket.getDateTime());
-            System.out.println("Seat: " + ticket.getSeat());
-            System.out.println("*********************************\n");
+        System.out.println("\nAll tickets booked by you:\n");
+        if(!currentUser.getTickets().isEmpty()) {
+            for (Ticket ticket : currentUser.getTickets()) {
+                System.out.println("*********************************");
+                System.out.println("Event: " + ticket.getEvent().getName());
+                System.out.println("Date: " + ticket.getDateTime());
+                System.out.println("Seat: " + ticket.getSeat());
+                System.out.println("*********************************\n");
+            }
+        }else{
+            System.out.println("\nYou have no purchased tickets!\n");
         }
         currentMenu = 0;
     }
