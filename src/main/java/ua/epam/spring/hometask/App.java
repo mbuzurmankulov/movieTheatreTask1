@@ -5,6 +5,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 import sun.plugin.dom.exception.InvalidStateException;
+import ua.epam.spring.hometask.aspects.CounterAspect;
 import ua.epam.spring.hometask.config.SpringConfig;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
@@ -28,6 +29,9 @@ public class App {
     private int currentMenu = 0;
     private String userInfo;
     private Scanner scanner;
+
+    @Autowired
+    private CounterAspect counterAspect;
 
     @Autowired
     public App(UserService userService, EventService eventService, BookingService bookingService){
@@ -78,6 +82,9 @@ public class App {
             case 5:
                 displayMyTickets();
                 break;
+            case 6:
+                displayStatistics();
+                break;
         }
     }
 
@@ -112,6 +119,8 @@ public class App {
         }
         System.out.println("Exit - press 7");
         allowedCommands.add(7);
+        System.out.println("Show statistics - press 8");
+        allowedCommands.add(8);
 
         Integer command;
         while (true) {
@@ -152,6 +161,8 @@ public class App {
             case 7:
                 currentMenu = -1;
                 break;
+            case 8:
+                currentMenu = 6;
         }
     }
 
@@ -320,6 +331,40 @@ public class App {
         }else{
             System.out.println("\nYou have no purchased tickets!\n");
         }
+        currentMenu = 0;
+    }
+
+    private void displayStatistics(){
+        System.out.println("\n**************Statistics*****************");
+        System.out.println("\nEvent access by name counter:\n");
+        if (counterAspect.getEventAccessByNameCounter().size() > 0) {
+            for (Map.Entry entry : counterAspect.getEventAccessByNameCounter().entrySet()) {
+                System.out.println("Event " + entry.getKey() + " " + entry.getValue() + " times");
+            }
+        } else {
+            System.out.println("N/A");
+        }
+
+        System.out.println("\nEvent query by price:\n");
+        if (counterAspect.getEventQueryByPriceCounter().size() > 0) {
+            for (Map.Entry entry : counterAspect.getEventQueryByPriceCounter().entrySet()) {
+                System.out.println("Event " + entry.getKey() + " " + entry.getValue() + " times");
+            }
+        } else {
+            System.out.println("N/A");
+        }
+
+        System.out.println("\nHow many times event's tickets were booked:\n");
+        if (counterAspect.getEventTicketBookingCount().size() > 0) {
+            for (Map.Entry entry : counterAspect.getEventTicketBookingCount().entrySet()) {
+                System.out.println("Event " + entry.getKey() + " " + entry.getValue() + " times");
+            }
+        } else {
+            System.out.println("N/A");
+        }
+
+        System.out.println("\n******************************************");
+
         currentMenu = 0;
     }
 

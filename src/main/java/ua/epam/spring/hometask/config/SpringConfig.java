@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
         "classpath:users.properties" //if same key, this will 'win'
         })
 @ComponentScan(basePackages = {"ua.epam.spring.hometask"})
+@EnableAspectJAutoProxy
 public class SpringConfig {
 
     @Autowired
