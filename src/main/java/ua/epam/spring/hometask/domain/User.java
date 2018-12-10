@@ -27,7 +27,16 @@ public class User extends DomainObject {
 
     private boolean isAdmin = false;
 
+    private String fullName;
+
     private NavigableSet<Ticket> tickets = new TreeSet<>();
+
+    public String getFullName(){
+        if(fullName == null){
+            fullName = firstName.concat(" ").concat(lastName);
+        }
+        return  fullName;
+    }
 
     @Override
     public int hashCode() {

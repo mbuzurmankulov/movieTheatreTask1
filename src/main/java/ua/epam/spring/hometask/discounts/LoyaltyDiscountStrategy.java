@@ -1,5 +1,6 @@
 package ua.epam.spring.hometask.discounts;
 
+import lombok.NoArgsConstructor;
 import sun.plugin.dom.exception.InvalidStateException;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.User;
@@ -8,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
 public class LoyaltyDiscountStrategy extends DiscountStrategy{
 
     private int discountTicketCount;

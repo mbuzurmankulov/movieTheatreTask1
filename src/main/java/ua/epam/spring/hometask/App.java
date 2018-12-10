@@ -6,6 +6,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.stereotype.Component;
 import sun.plugin.dom.exception.InvalidStateException;
 import ua.epam.spring.hometask.aspects.CounterAspect;
+import ua.epam.spring.hometask.aspects.DiscountAspect;
 import ua.epam.spring.hometask.config.SpringConfig;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.Ticket;
@@ -32,6 +33,8 @@ public class App {
 
     @Autowired
     private CounterAspect counterAspect;
+    @Autowired
+    private DiscountAspect discountAspect;
 
     @Autowired
     public App(UserService userService, EventService eventService, BookingService bookingService){
@@ -335,35 +338,57 @@ public class App {
     }
 
     private void displayStatistics(){
-        System.out.println("\n**************Statistics*****************");
-        System.out.println("\nEvent access by name counter:\n");
+        System.out.println("\n**************Events statistics*****************");
+        System.out.println("\n\tEvent access by name counter:\n");
         if (counterAspect.getEventAccessByNameCounter().size() > 0) {
             for (Map.Entry entry : counterAspect.getEventAccessByNameCounter().entrySet()) {
-                System.out.println("Event " + entry.getKey() + " " + entry.getValue() + " times");
+                System.out.println("\t\tEvent " + ((Event)entry.getKey()).getName() + " " + entry.getValue() + " times");
             }
         } else {
-            System.out.println("N/A");
+            System.out.println("\t\tN/A");
         }
 
-        System.out.println("\nEvent query by price:\n");
+        System.out.println("\n\tEvent query by price:\n");
         if (counterAspect.getEventQueryByPriceCounter().size() > 0) {
             for (Map.Entry entry : counterAspect.getEventQueryByPriceCounter().entrySet()) {
-                System.out.println("Event " + entry.getKey() + " " + entry.getValue() + " times");
+                System.out.println("\t\tEvent " + ((Event)entry.getKey()).getName() + " " + entry.getValue() + " times");
             }
         } else {
-            System.out.println("N/A");
+            System.out.println("\t\tN/A");
         }
 
-        System.out.println("\nHow many times event's tickets were booked:\n");
+        System.out.println("\n\tHow many times event's tickets were booked:\n");
         if (counterAspect.getEventTicketBookingCount().size() > 0) {
             for (Map.Entry entry : counterAspect.getEventTicketBookingCount().entrySet()) {
-                System.out.println("Event " + entry.getKey() + " " + entry.getValue() + " times");
+                System.out.println("\t\tEvent " + ((Event)entry.getKey()).getName() + " " + entry.getValue() + " times");
             }
         } else {
-            System.out.println("N/A");
+            System.out.println("\t\tN/A");
         }
 
-        System.out.println("\n******************************************");
+        System.out.println("\n************************************************");
+
+        System.out.println("\n*************Discounts statistics***************");
+        System.out.println("\tDiscount strategies:");
+
+        if(!discountAspect.getDiscountCallCount().isEmpty()) {
+            for (Class c : discountAspect.getDiscountCallCount().keySet()) {
+                System.out.println("\t\t" + c.getSimpleName() + ":");
+                System.out.println("\t\t\tTotal calls: " + discountAspect.getDiscountCallCount().get(c));
+                Map<User, Long> tmpMap =discountAspect.getDiscountCallPerUserCount().get(c);
+                for (User u : tmpMap.keySet()){
+                    System.out.println("\t\t\tDiscount for user " +
+                            u.getFullName() +
+                            " was requested " +
+                            tmpMap.get(u) +
+                            " times");
+                }
+            }
+        } else {
+            System.out.println("\t\tN/A");
+        }
+
+        System.out.println("**************************************************");
 
         currentMenu = 0;
     }

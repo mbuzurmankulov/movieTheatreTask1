@@ -1,5 +1,6 @@
 package ua.epam.spring.hometask.discounts;
 
+import lombok.NoArgsConstructor;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.User;
 
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
+@NoArgsConstructor
 public class BirthdayDiscountStrategy extends DiscountStrategy {
 
     public BirthdayDiscountStrategy(byte discount){
