@@ -15,7 +15,7 @@ import java.util.stream.LongStream;
  */
 @Getter
 @Setter
-public class Auditorium {
+public class Auditorium extends DomainObject{
 
     private String name;
 

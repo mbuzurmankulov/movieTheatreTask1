@@ -1,9 +1,12 @@
 package ua.epam.spring.hometask.config;
 
+import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import ua.epam.spring.hometask.domain.Auditorium;
 import ua.epam.spring.hometask.domain.Event;
 import ua.epam.spring.hometask.domain.EventRating;
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 @PropertySource({
         "classpath:auditorium.properties",
         "classpath:users.properties" //if same key, this will 'win'
+        ,"classpath:jdbc.properties"
         })
 @ComponentScan(basePackages = {"ua.epam.spring.hometask"})
 @EnableAspectJAutoProxy
@@ -95,5 +99,28 @@ public class SpringConfig {
         admin.setPassword(env.getProperty("user1.password"));
         admin.setBirthday(LocalDate.parse(env.getProperty("user1.birthday")));
         return admin;
+    }
+
+    @Bean
+    public DriverManagerDataSource dataSource(){
+        DriverManagerDataSource source = new DriverManagerDataSource();
+        source.setDriverClassName(env.getProperty("jdbc.driverClassName"));
+        source.setUsername(env.getProperty("jdbc.username"));
+        source.setPassword(env.getProperty("jdbc.password"));
+        source.setUrl(env.getProperty("jdbc.url"));
+        return  source;
+    }
+
+    @Bean
+    public JdbcTemplate jdbcTemplate(){
+        return new JdbcTemplate(dataSource());
+    }
+
+    @Bean
+    public SpringLiquibase liquibase() {
+        SpringLiquibase liquibase = new SpringLiquibase();
+        liquibase.setChangeLog("classpath:migrations/liquibase-changeLog.xml");
+        liquibase.setDataSource(dataSource());
+        return liquibase;
     }
 }
